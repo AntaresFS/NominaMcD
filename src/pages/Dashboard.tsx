@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { useNavigate } from "react-router-dom";
 import ShiftPayrollForm from "../components/ShiftPayrollForm";
-import { User } from "@supabase/supabase-js";
+import { type User } from "@supabase/supabase-js";
 
 export default function Dashboard() {
   const [user, setUser] = useState<User | null>(null); // Inicializar con null
