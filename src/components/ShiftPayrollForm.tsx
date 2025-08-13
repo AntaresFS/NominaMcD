@@ -76,4 +76,61 @@ export default function ShiftPayrollForm() {
           <input
             type="number"
             value={hourlyRate}
-            onChang
+            onChange={(e) => setHourlyRate(Number(e.target.value))}
+            className="border rounded p-1 w-full"
+          />
+        </label>
+
+        <label className="block">
+          Horas festivas
+          <input
+            type="number"
+            value={holidayHours}
+            onChange={(e) => setHolidayHours(Number(e.target.value))}
+            className="border rounded p-1 w-full"
+          />
+        </label>
+
+        <label className="block">
+          Horas complementarias
+          <input
+            type="number"
+            value={extraHours}
+            onChange={(e) => setExtraHours(Number(e.target.value))}
+            className="border rounded p-1 w-full"
+          />
+        </label>
+
+        <label className="block">
+          Plus transporte (€)
+          <input
+            type="number"
+            value={plusTransport}
+            onChange={(e) => setPlusTransport(Number(e.target.value))}
+            className="border rounded p-1 w-full"
+          />
+        </label>
+
+        <label className="block">
+          Plus comida (€)
+          <input
+            type="number"
+            value={plusMeal}
+            onChange={(e) => setPlusMeal(Number(e.target.value))}
+            className="border rounded p-1 w-full"
+          />
+        </label>
+      </div>
+
+      <div className="mt-6 bg-gray-100 p-4 rounded">
+        <p><strong>Salario base:</strong> €{payroll.baseSalary.toFixed(2)}</p>
+        <p><strong>Plus nocturnidad:</strong> €{payroll.nightBonus.toFixed(2)}</p>
+        <p><strong>Plus festivos:</strong> €{payroll.holidayBonus.toFixed(2)}</p>
+        <p><strong>Horas complementarias:</strong> €{payroll.extraBonus.toFixed(2)}</p>
+        <p className="text-lg font-bold mt-2">
+          Total bruto: €{payroll.total.toFixed(2)}
+        </p>
+      </div>
+    </div>
+  );
+}

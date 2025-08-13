@@ -1,54 +1,89 @@
-import { useState } from 'react';
-import { supabase } from './lib/supabaseClient';
+// src/components/AuthForm.tsx
+import React, { useState } from "react";
+import { supabase } from "../lib/supabaseClient";
 
-export default function AuthForm() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [remember, setRemember] = useState(true);
-  const [category, setCategory] = useState<'aprendiz'|'equipo'>('aprendiz');
-  const [contractHours, setContractHours] = useState(20);
+interface AuthFormProps {
+  mode: "login" | "signup";
+  onAuthSuccess: () => void;
+}
+
+export default function AuthForm({ mode, onAuthSuccess }: AuthFormProps) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
-  const handleSignUp = async () => {
+  const handleAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
     setLoading(true);
-    const { data: _data, error } = await supabase.auth.signUp({
-      email,
-      password
-    });
-    if (error) console.error(error);
-    setLoading(false);
-  };
+    setMessage("");
 
-  const handleSignIn = async () => {
-    setLoading(true);
-    await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const { error } =
+      mode === "login"
+        ? await supabase.auth.signInWithPassword({ email, password })
+        : await supabase.auth.signUp({ email, password });
+
+    if (error) {
+      setMessage(`Error: ${error.message}`);
+    } else {
+      setMessage(`¡${mode === "login" ? "Inicio de sesión exitoso!" : "Registro exitoso! Revisa tu email para verificar."}`);
+      if (mode === "login") {
+        onAuthSuccess();
+      }
+    }
     setLoading(false);
   };
 
   return (
-    <div className="p-4 max-w-sm mx-auto space-y-4">
-      <input value={email} onChange={(e)=>setEmail(e.target.value)} placeholder="Email" className="w-full border p-2 rounded"/>
-      <div className="flex">
-        <input type={showPassword ? 'text' : 'password'} value={password} onChange={(e)=>setPassword(e.target.value)} placeholder="Contraseña" className="flex-1 border p-2 rounded"/>
-        <button type="button" onClick={()=>setShowPassword(s=>!s)} className="ml-2">{showPassword ? '🙈' : '👁️'}</button>
-      </div>
-      <label className="flex items-center space-x-2">
-        <input type="checkbox" checked={remember} onChange={(e)=>setRemember(e.target.checked)}/>
-        <span>Recordarme</span>
-      </label>
-      <select value={category} onChange={(e)=>setCategory(e.target.value as 'aprendiz'|'equipo')} className="w-full border p-2 rounded">
-        <option value="aprendiz">Aprendiz</option>
-        <option value="equipo">Personal de equipo</option>
-      </select>
-      <input type="number" value={contractHours} onChange={(e)=>setContractHours(parseFloat(e.target.value))} placeholder="Horas semanales" className="w-full border p-2 rounded"/>
-      <div className="flex space-x-2">
-        <button onClick={handleSignIn} disabled={loading} className="flex-1 bg-blue-500 text-white p-2 rounded">Login</button>
-        <button onClick={handleSignUp} disabled={loading} className="flex-1 bg-green-500 text-white p-2 rounded">Registro</button>
-      </div>
+    // Contenedor del formulario con esquinas redondeadas, sombra y borde
+    <div className="bg-white p-8 rounded-xl shadow-xl max-w-sm w-full border border-gray-200">
+      {/* Título del formulario con color oscuro */}
+      <h2 className="text-3xl font-bold text-[#222222] mb-6 text-center">
+        {mode === "login" ? "Iniciar Sesión" : "Regístrate"}
+      </h2>
+      <form onSubmit={handleAuth}>
+        <div className="mb-4">
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+            Email
+          </label>
+          <input
+            type="email"
+            id="email"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#FFC72C] transition-colors duration-200"
+            placeholder="tu.email@ejemplo.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </div>
+        <div className="mb-6">
+          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+            Contraseña
+          </label>
+          <input
+            type="password"
+            id="password"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#FFC72C] transition-colors duration-200"
+            placeholder="********"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+        {/* Botón de envío con el color rojo de McDonald's y efecto al pasar el ratón */}
+        <button
+          type="submit"
+          className="w-full bg-[#DA291C] text-white py-3 rounded-lg font-bold hover:bg-[#BF0A0A] transition-colors duration-300 transform hover:scale-105 active:scale-95 shadow-md focus:outline-none"
+          disabled={loading}
+        >
+          {loading ? "Cargando..." : mode === "login" ? "Iniciar Sesión" : "Regístrate"}
+        </button>
+      </form>
+      {message && (
+        <p className={`mt-4 text-center ${message.includes("Error") ? "text-red-500" : "text-green-500"}`}>
+          {message}
+        </p>
+      )}
     </div>
   );
 }
